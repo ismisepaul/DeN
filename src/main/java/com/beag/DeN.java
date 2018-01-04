@@ -7,11 +7,11 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.StringUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class DeN
 {
-    public static String url_en(String str)
+    public static String urlEncode(String str)
     {
         String utf8 = "This is not UTF-8";
         try
@@ -25,7 +25,7 @@ public class DeN
         return utf8;
     }
 
-    public static String url_de(String str)
+    public static String urlDecode(String str)
     {
         String utf8 = "This is not UTF-8";
         try
@@ -39,16 +39,13 @@ public class DeN
         return utf8;
     }
 
-    public static String base64_en(String str)
+    public static String base64Encode(String str)
     {
-        byte[] base64 = str.getBytes();
-
-        String enStr = DatatypeConverter.printBase64Binary(base64);
-
-        return enStr;
+        str = DatatypeConverter.printBase64Binary(str.getBytes());
+        return str;
     }
 
-    public static String base64_de(String str)
+    public static String base64Decode(String str)
     {
         byte[] base64 = null;
 
@@ -58,35 +55,38 @@ public class DeN
         return deStr;
     }
 
-    public static String html_en(String str)
+    public static String htmlEncode(String str)
     {
         String enStr = StringEscapeUtils.escapeHtml4(str);
 
         return enStr;
     }
 
-    public static String html_de(String str)
+    public static String htmlDecode(String str)
     {
         String deStr = StringEscapeUtils.unescapeHtml4(str);
 
         return deStr;
     }
 
-    public static String xml_en(String str)
+
+
+    public static String xmlEncode(String str)
     {
-        String enStr = StringEscapeUtils.escapeXml(str);
+        String enStr = StringEscapeUtils.escapeXml11(str);
 
         return enStr;
     }
 
-    public static String xml_de(String str)
+    public static String xmlDecode(String str)
     {
         String deStr = StringEscapeUtils.unescapeXml(str);
 
         return deStr;
     }
 
-    public static String hex_en(String str)
+
+    public static String hexEncode(String str)
     {
         byte[] enByte = str.getBytes();
 
@@ -95,7 +95,7 @@ public class DeN
         return enStr;
     }
 
-    public static String hex_de(String str)
+    public static String hexDecode(String str)
     {
         String deStr = "This is not a Hex value";
         char[] deChar = str.toCharArray();
@@ -112,7 +112,7 @@ public class DeN
         return deStr;
     }
 
-    public static String dec_en(String str)
+    public static String decEncode(String str)
     {
         String enStr = "";
         for (int i = 0; i < str.length(); i++)
@@ -124,22 +124,20 @@ public class DeN
         return enStr;
     }
 
-    public static String dec_de(String str)
+    public static String decDecode(String str)
     {
         int dec_num = Integer.parseInt(str);
 
         char deChar = (char)dec_num;
 
-        String deStr = Character.toString(deChar);
-
-        return deStr;
+        return Character.toString(deChar);
     }
 
-    public static String utf8_en(String str, int choice)
+    public static String utf8Encode(String str, int choice)
     {
         byte[] utf8bytes = StringUtils.getBytesUtf8(str);
         if (choice == 1) {
-            str = utf8_url_format(utf8bytes);
+            str = utf8UrlFormat(utf8bytes);
         }
         if (choice == 2)
         {
@@ -152,7 +150,7 @@ public class DeN
                 utf8_2bytes[(j + 1)] = ((byte)(utf8bytes[i] & 0x3F | 0x80));
                 j++;i++;
             }
-            str = utf8_url_format(utf8_2bytes);
+            str = utf8UrlFormat(utf8_2bytes);
         }
         else if (choice == 3)
         {
@@ -166,12 +164,12 @@ public class DeN
                 utf8_3bytes[(j + 2)] = ((byte)(utf8bytes[i] & 0x3F | 0x80));
                 j++;i++;
             }
-            str = utf8_url_format(utf8_3bytes);
+            str = utf8UrlFormat(utf8_3bytes);
         }
         return str;
     }
 
-    private static String utf8_url_format(byte[] b)
+    private static String utf8UrlFormat(byte[] b)
     {
         StringBuilder sb = new StringBuilder();
 
@@ -184,6 +182,39 @@ public class DeN
         }
         String str = sb.toString();
 
+        return str;
+    }
+
+    public static String unicodeEncode(char[] charArray, int choice){
+
+        StringBuilder result = new StringBuilder();
+
+        switch (choice) {
+
+            case 1: for (char ch : charArray) {
+                result.append("\\u00" + Integer.toHexString(ch));
+
+            }
+            break;
+
+            case 2: for (char ch : charArray) {
+                result.append("\\x" + Integer.toHexString(ch));
+            }
+
+
+        }
+
+        return result.toString();
+
+    }
+
+    public static String unicodeDecode(String str){
+
+        //check if string has preceding \\x then replace with \\u00 for conversion
+        if(str.contains("\\x")){
+            str = str.replace("\\x", "\\u00");
+        }
+        str = StringEscapeUtils.unescapeJava(str);
         return str;
     }
 }

@@ -10,11 +10,13 @@ import javax.swing.*;
 class DeNGui
 {
     private JFrame frameDen;
-    private final ButtonGroup buttonGroup = new ButtonGroup();
-    private final ButtonGroup buttonGroup_1 = new ButtonGroup();
+    private final ButtonGroup buttonGroupUtf8 = new ButtonGroup();
+    private final ButtonGroup buttonGroupUtf8ByteNum = new ButtonGroup();
+    private final ButtonGroup buttonGroupUniCode = new ButtonGroup();
     private static String STR_ENCODE = "Encode";
     private static String STR_DECODE = "Decode";
     private static String STR_COPY = "Copy output to clipboard";
+    String[] OPTIONS = new String[] { "URL (UTF-8)", "Hex (UTF-8)", "Decimal (UTF-8)", "Base64", "HTML 4", "XML", "UniCode" };
 
     public static void main(String[] args)
     {
@@ -54,6 +56,7 @@ class DeNGui
         this.frameDen.getContentPane().add(panelDen, "Center");
         panelDen.setLayout(null);
 
+        //Optional Panels
         final JPanel panel_utf8 = new JPanel();
         panel_utf8.setBounds(434, 104, 123, 168);
         panelDen.add(panel_utf8);
@@ -66,6 +69,13 @@ class DeNGui
         panel_utf8Bytes.setLayout(null);
         panel_utf8Bytes.setVisible(false);
 
+        final JPanel panelUniCode = new JPanel();
+        panelUniCode.setBounds(434, 104, 123, 168);
+        panelDen.add(panelUniCode);
+        panelUniCode.setLayout(null);
+        panelUniCode.setVisible(false);
+
+        //Optioinal Radio Buttons
         final JRadioButton rdbtnSpecialChars = new JRadioButton("Special Chars");
         rdbtnSpecialChars.addActionListener(new ActionListener()
         {
@@ -77,7 +87,7 @@ class DeNGui
             }
         });
         rdbtnSpecialChars.setSelected(true);
-        this.buttonGroup.add(rdbtnSpecialChars);
+        this.buttonGroupUtf8.add(rdbtnSpecialChars);
         rdbtnSpecialChars.setBounds(6, 7, 109, 23);
         panel_utf8.add(rdbtnSpecialChars);
 
@@ -91,7 +101,7 @@ class DeNGui
                 }
             }
         });
-        this.buttonGroup.add(rdbtnAllChars);
+        this.buttonGroupUtf8.add(rdbtnAllChars);
         rdbtnAllChars.setBounds(6, 33, 109, 23);
         panel_utf8.add(rdbtnAllChars);
 
@@ -99,7 +109,7 @@ class DeNGui
         rdbtn1Byte.setBounds(6, 7, 111, 23);
         panel_utf8Bytes.add(rdbtn1Byte);
         rdbtn1Byte.setSelected(true);
-        this.buttonGroup_1.add(rdbtn1Byte);
+        this.buttonGroupUtf8ByteNum.add(rdbtn1Byte);
 
         final JRadioButton rdbtn2bytes = new JRadioButton("2 bytes");
         rdbtn2bytes.addActionListener(new ActionListener()
@@ -111,26 +121,47 @@ class DeNGui
         });
         rdbtn2bytes.setBounds(6, 35, 111, 23);
         panel_utf8Bytes.add(rdbtn2bytes);
-        this.buttonGroup_1.add(rdbtn2bytes);
+        this.buttonGroupUtf8ByteNum.add(rdbtn2bytes);
 
         final JRadioButton rdbtn3bytes = new JRadioButton("3 bytes");
         rdbtn3bytes.setBounds(6, 61, 111, 23);
         panel_utf8Bytes.add(rdbtn3bytes);
-        this.buttonGroup_1.add(rdbtn3bytes);
+        this.buttonGroupUtf8ByteNum.add(rdbtn3bytes);
 
+        //Unicode Buttons
+        final JRadioButton radioButtonUniCodeU00 = new JRadioButton("\\u00");
+        radioButtonUniCodeU00.setSelected(true);
+        this.buttonGroupUniCode.add(radioButtonUniCodeU00);
+        radioButtonUniCodeU00.setBounds(6, 7, 109, 23);
+        panelUniCode.add(radioButtonUniCodeU00);
+
+        final JRadioButton radioButtonUniCodeX = new JRadioButton("\\x");
+        radioButtonUniCodeX.setSelected(false);
+        this.buttonGroupUniCode.add(radioButtonUniCodeX);
+        radioButtonUniCodeX.setBounds(6, 33, 109, 23);
+        panelUniCode.add(radioButtonUniCodeX);
+
+        //ComboBox
         final JComboBox<String> comboBox = new JComboBox<String>();
         comboBox.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent arg0)
             {
                 if (comboBox.getSelectedIndex() == 0) {
+                    panelUniCode.setVisible(false);
                     panel_utf8.setVisible(true);
-                } else {
+                }
+                else if(comboBox.getSelectedIndex() == 6){
                     panel_utf8.setVisible(false);
+                    panelUniCode.setVisible(true);
+                }
+                else {
+                    panel_utf8.setVisible(false);
+                    panelUniCode.setVisible(false);
                 }
             }
         });
-        comboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "URL (UTF-8)", "Hex (UTF-8)", "Decimal (UTF-8)", "Base64", "HTML 4", "XML" }));
+        comboBox.setModel(new DefaultComboBoxModel<String>(OPTIONS));
         comboBox.setSelectedIndex(0);
         comboBox.setBounds(434, 44, 111, 24);
         panelDen.add(comboBox);
@@ -168,51 +199,59 @@ class DeNGui
 
                 if ((comboBox.getSelectedIndex() == 0) && (rdbtnSpecialChars.isSelected()))
                 {
-                    String encode = DeN.url_en(userInput);
+                    String encode = DeN.urlEncode(userInput);
                     progOutput.setText(encode);
                 }
                 else if ((comboBox.getSelectedIndex() == 0) && (rdbtnAllChars.isSelected()) && (rdbtn1Byte.isSelected()))
                 {
-                    String encode = DeN.utf8_en(userInput, 1);
+                    String encode = DeN.utf8Encode(userInput, 1);
                     progOutput.setText(encode);
                 }
                 else if ((comboBox.getSelectedIndex() == 0) && (rdbtnAllChars.isSelected()) && (rdbtn2bytes.isSelected()))
                 {
-                    String encode = DeN.utf8_en(userInput, 2);
+                    String encode = DeN.utf8Encode(userInput, 2);
                     progOutput.setText(encode);
                 }
                 else if ((comboBox.getSelectedIndex() == 0) && (rdbtnAllChars.isSelected()) && (rdbtn3bytes.isSelected()))
                 {
-                    String encode = DeN.utf8_en(userInput, 3);
+                    String encode = DeN.utf8Encode(userInput, 3);
                     progOutput.setText(encode);
                 }
                 else if (comboBox.getSelectedIndex() == 1)
                 {
-                    String encode = DeN.hex_en(userInput);
+                    String encode = DeN.hexEncode(userInput);
                     progOutput.setText(encode);
                 }
                 else if (comboBox.getSelectedIndex() == 2)
                 {
-                    String encode = DeN.dec_en(userInput);
+                    String encode = DeN.decEncode(userInput);
                     progOutput.setText(encode);
                 }
                 else if (comboBox.getSelectedIndex() == 3)
                 {
-                    String encode = DeN.base64_en(userInput);
+                    String encode = DeN.base64Encode(userInput);
                     progOutput.setText(encode);
                 }
                 else if (comboBox.getSelectedIndex() == 4)
                 {
-                    String encode = DeN.html_en(userInput);
+                    String encode = DeN.htmlEncode(userInput);
                     progOutput.setText(encode);
                 }
                 else if (comboBox.getSelectedIndex() == 5)
                 {
-                    String encode = DeN.xml_en(userInput);
+                    String encode = DeN.xmlEncode(userInput);
+                    progOutput.setText(encode);
+                }
+                else if (comboBox.getSelectedIndex() == 6 && radioButtonUniCodeU00.isSelected()){
+                    String encode = DeN.unicodeEncode(userInput.toCharArray(), 1);
+                    progOutput.setText(encode);
+                }
+                else if (comboBox.getSelectedIndex() == 6 && radioButtonUniCodeX.isSelected()){
+                    String encode = DeN.unicodeEncode(userInput.toCharArray(), 2);
                     progOutput.setText(encode);
                 }
                 copyToClipboard(progOutput.getText());
-                displayDialog(frameDen, "Copied", true);
+                //displayDialog(frameDen, "Copied", true);
             }
         });
         btnEncode.setToolTipText(STR_COPY);
@@ -226,33 +265,37 @@ class DeNGui
             {
                 if (comboBox.getSelectedIndex() == 0)
                 {
-                    String decode = DeN.url_de(jtextUserInput.getText());
+                    String decode = DeN.urlDecode(jtextUserInput.getText());
                     progOutput.setText(decode);
                 }
                 else if (comboBox.getSelectedIndex() == 1)
                 {
-                    String decode = DeN.hex_de(jtextUserInput.getText());
+                    String decode = DeN.hexDecode(jtextUserInput.getText());
                     progOutput.setText(decode);
 
                 }
                 else if (comboBox.getSelectedIndex() == 2)
                 {
-                    String decode = DeN.dec_de(jtextUserInput.getText());
+                    String decode = DeN.decDecode(jtextUserInput.getText());
                     progOutput.setText(decode);
                 }
                 else if (comboBox.getSelectedIndex() == 3)
                 {
-                    String decode = DeN.base64_de(jtextUserInput.getText());
+                    String decode = DeN.base64Decode(jtextUserInput.getText());
                     progOutput.setText(decode);
                 }
                 else if (comboBox.getSelectedIndex() == 4)
                 {
-                    String decode = DeN.html_de(jtextUserInput.getText());
+                    String decode = DeN.htmlDecode(jtextUserInput.getText());
                     progOutput.setText(decode);
                 }
                 else if (comboBox.getSelectedIndex() == 5)
                 {
-                    String decode = DeN.xml_de(jtextUserInput.getText());
+                    String decode = DeN.xmlDecode(jtextUserInput.getText());
+                    progOutput.setText(decode);
+                }
+                else if (comboBox.getSelectedIndex() == 6){
+                    String decode = DeN.unicodeDecode(jtextUserInput.getText());
                     progOutput.setText(decode);
                 }
                 copyToClipboard(progOutput.getText());
